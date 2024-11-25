@@ -33,6 +33,7 @@ public final class Main extends JavaPlugin {
             getLogger().info("Loaded class: " + myClass.getName());
             getLogger().info("Instance created: " + instance);
 
+            myClass.getMethod("main").invoke(instance);
         } catch (IOException | ReflectiveOperationException e) {
             getLogger().severe("Failed to load classes: " + e.getMessage());
             e.printStackTrace();
