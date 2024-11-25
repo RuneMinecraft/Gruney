@@ -1,6 +1,7 @@
 package net.runemc.utils.command;
 
 import net.runemc.plugin.Main;
+import net.runemc.utils.Locale;
 import net.runemc.utils.Logger;
 import net.runemc.utils.server.ServerType;
 import net.runemc.utils.wrapper.message.Message;
@@ -36,7 +37,7 @@ public final class Register {
     private final List<Listener> registeredListeners = new ArrayList<>();
 
     public void autoRegisterCommands() {
-        ServerType currentServer = ServerType.valueOf(Main.get().config().getValue(String.class, "server.type"));
+        ServerType currentServer = ServerType.HUB; // ServerType.valueOf(Main.get().config().getValue(String.class, "server.type"));
 
         Reflections reflections = new Reflections("net.runemc.plugin", new TypeAnnotationsScanner());
         Logger.logRaw("[Bootstrap | Commands] Scanning 'net.runemc.plugin' for all commands.");

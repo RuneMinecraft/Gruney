@@ -26,13 +26,10 @@ public final class Server {
     }
     public static Server of() {
         try {
-            final ServerType type = ServerType.valueOf(Main.get().config().getValue(String.class, "server.type"));
-            final int release = Integer.parseInt(Objects.requireNonNull(Main.get().config().getValue(String.class, "server.release")));
-            final String description = Main.get().config().getValue(String.class, "server.description");
-            return new Server(type, release, description);
+            return new Server(ServerType.HUB, 1, "description");
         }catch(NullPointerException e) {
             e.printStackTrace();
-            return Consts.DEFAULT_SERVER;
+            return null;
         }
     }
 

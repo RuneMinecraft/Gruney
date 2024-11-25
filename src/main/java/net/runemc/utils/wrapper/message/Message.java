@@ -2,7 +2,6 @@ package net.runemc.utils.wrapper.message;
 
 import net.runemc.utils.Logger;
 import net.runemc.utils.Utils;
-import net.runemc.utils.wrapper.player.User;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -15,29 +14,12 @@ import java.util.stream.Collectors;
 public final class Message implements Utils {
     private final MessageType type;
     private final Set<CommandSender> players;
-    private final Set<User> users;
     private final String[] messages;
 
     private Message(MessageType type, Set<?> input, String... messages) {
         this.type = type;
         this.messages = messages;
-
         this.players = new HashSet<>();
-        this.users = new HashSet<>();
-
-        if (!input.isEmpty() && input.iterator().next() instanceof CommandSender) {
-            input.forEach(item -> {
-                CommandSender player = (CommandSender) item;
-                this.players.add(player);
-                this.users.add(User.of(player.getName()));
-            });
-        } else if (!input.isEmpty() && input.iterator().next() instanceof User) {
-            input.forEach(item -> {
-                User user = (User) item;
-                this.users.add(user);
-                this.players.add(user.getPlayer());
-            });
-        }
     }
 
     public static Message create(MessageType type, CommandSender player, String ... messages) {
@@ -53,19 +35,6 @@ public final class Message implements Utils {
         return create(MessageType.NORMAL, players, messages);
     }
 
-    public static Message create(MessageType type, User user, String ... messages) {
-        return Message.create(type, Collections.singleton(user).toArray(User[]::new), messages);
-    }
-    public static Message create(User user, String ... messages) {
-        return Message.create(MessageType.NORMAL, user, messages);
-    }
-    public static Message create(MessageType type, User[] users, String ... messages) {
-        return new Message(type, Arrays.stream(users).collect(Collectors.toSet()), messages);
-    }
-    public static Message create(User[] users, String ... messages) {
-        return Message.create(MessageType.NORMAL, users, messages);
-    }
-
     public static Message broadcast(MessageType type, String ... messages) {
         return create(type, Bukkit.getOnlinePlayers().toArray(CommandSender[]::new), messages);
     }
@@ -78,9 +47,6 @@ public final class Message implements Utils {
     }
     public Set<CommandSender> players() {
         return this.players;
-    }
-    public Set<User> users() {
-        return this.users;
     }
     public String[] messages() {
         return this.messages;

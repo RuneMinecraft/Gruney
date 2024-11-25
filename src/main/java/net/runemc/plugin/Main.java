@@ -15,9 +15,14 @@ import java.util.Optional;
 
 public final class Main extends JavaPlugin {
     private RuneClassLoader classLoader;
+    private static Main instance;
+    public static Main get() {
+        return instance;
+    }
 
     @Override
     public void onEnable() {
+        instance = this;
         try {
             File pluginClassesDir = new File(getDataFolder(), "classes");
             if (!pluginClassesDir.exists() && !pluginClassesDir.mkdirs()) {
