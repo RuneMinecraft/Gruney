@@ -3,6 +3,7 @@ package net.runemc.plugin;
 import net.runemc.plugin.scripting.RuneClassLoader;
 import net.runemc.plugin.scripting.commands.LoadScript;
 import net.runemc.plugin.scripting.commands.UnloadScript;
+import net.runemc.utils.command.Register;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -48,8 +49,8 @@ public final class Main extends JavaPlugin {
             getLogger().severe("Failed to load classes: " + e.getMessage());
             e.printStackTrace();
         }
-        this.getCommand("load-script").setExecutor(new LoadScript());
-        this.getCommand("unload-script").setExecutor(new UnloadScript());
+        Register reg = Register.get();
+        reg.autoRegisterCommands();
     }
 
 
