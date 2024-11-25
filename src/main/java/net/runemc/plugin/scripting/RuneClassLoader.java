@@ -1,11 +1,9 @@
 package net.runemc.plugin.scripting;
 
-
 import javax.tools.JavaCompiler;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -13,12 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class RuneClassLoader {
-    private final static List<Class<?>> loadedClasses = new ArrayList<>();
+    private final List<Class<?>> loadedClasses = new ArrayList<>();
     private final URLClassLoader classLoader;
 
     private RuneClassLoader(URL[] urls, ClassLoader parent) {
         this.classLoader = new URLClassLoader(urls, parent);
     }
+
     public static RuneClassLoader fromPluginDirectory(File directory, ClassLoader parent) throws IOException {
         if (!directory.exists() || !directory.isDirectory()) {
             throw new IllegalArgumentException("The provided path is not a valid directory!");
@@ -26,6 +25,7 @@ public final class RuneClassLoader {
         URL[] urls = {directory.toURI().toURL()};
         return new RuneClassLoader(urls, parent);
     }
+
     public void compileJavaFiles(File directory) throws IOException {
         if (!directory.exists() || !directory.isDirectory()) {
             throw new IllegalArgumentException("The provided path is not a valid directory!");
@@ -52,6 +52,7 @@ public final class RuneClassLoader {
             }
         }
     }
+
     private void findJavaFiles(File directory, List<File> javaFiles) {
         for (File file : directory.listFiles()) {
             if (file.isDirectory()) {
@@ -61,34 +62,28 @@ public final class RuneClassLoader {
             }
         }
     }
+
     public Class<?> loadClass(String className) throws ClassNotFoundException {
         Class<?> clazz = classLoader.loadClass(className);
-        loadedClasses.add(clazz);
+        synchronized (loadedClasses) {
+            loadedClasses.add(clazz);
+        }
         return clazz;
     }
-    public void unloadClass(String className) {
-        Class<?> clazz = loadedClasses.get(getByName(className));
-        clazz.
-    }
+
     public Object createInstance(String className) throws ReflectiveOperationException, ClassNotFoundException {
         Class<?> loadedClass = loadClass(className);
         return loadedClass.getDeclaredConstructor().newInstance();
     }
 
     public void unload() {
+        synchronized (loadedClasses) {
+            loadedClasses.clear();
+        }
         try {
             classLoader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private int getByName(String className) {
-        for (int i = 0; i < loadedClasses.size(); i++) {
-            if (loadedClasses.get(i).getName().equals(className)) {
-                return i;
-            }
-        }
-        return -1;
     }
 }
