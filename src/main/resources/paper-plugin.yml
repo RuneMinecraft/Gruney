@@ -1,0 +1,9 @@
+name: Gruney
+version: '0.1'
+main: net.runemc.plugin.Main
+api-version: '1.21'
+prefix: Gruney
+load: STARTUP
+authors: [ dank1234., nLaykon ]
+description: The best plugin you ever named
+website: https://www.runemc.net
