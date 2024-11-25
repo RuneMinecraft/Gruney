@@ -4,6 +4,6 @@ main: net.runemc.plugin.Main
 api-version: '1.21'
 prefix: Gruney
 load: STARTUP
-authors: [ dank1234., nLaykon ]
+authors: [ dank1234 ]
 description: The best plugin you ever named
 website: https://www.runemc.net
