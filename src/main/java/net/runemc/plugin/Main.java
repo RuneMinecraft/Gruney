@@ -12,12 +12,13 @@ import java.util.Optional;
 public final class Main extends JavaPlugin {
     private final static RuneClassLoader classLoader = RuneClassLoader.instance(new GroovyClassLoader());
     List<String> CONFIG_LOCATIONS = List.of(
-            this.getDataFolder().toString()
+            this.getDataFolder().getPath() + "/Test.groovy"
     );
 
     @Override
     public void onEnable() {
         try {
+            Class.forName("groovy.lang.GroovyClassLoader");
             File script = this.findFile().orElse(null);
             Class<?> scriptClass = classLoader.load(script);
             Object clazz = classLoader.createInstance(scriptClass);

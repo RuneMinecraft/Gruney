@@ -30,7 +30,6 @@ dependencies {
     api("org.reflections:reflections:0.9.12")
     compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
     implementation("org.incendo:cloud-paper:2.0.0-beta.10")
-    implementation("org.apache.groovy:groovy-all:4.0.15")
 }
 
 tasks {
@@ -45,6 +44,8 @@ tasks {
 
     shadowJar {
         archiveClassifier.set("")
+
+
 
         fun reloc(pkg: String) = relocate(pkg, "net.runemc.plugin.dependency.$pkg")
 
