@@ -43,9 +43,8 @@ tasks {
     }
 
     shadowJar {
-        archiveClassifier.set("")  // No classifier for the final shadow jar
+        archiveClassifier.set("")
 
-        // Relocate specific dependencies as in File 2
         fun reloc(pkg: String) = relocate(pkg, "net.runemc.plugin.dependency.$pkg")
 
         reloc("org.incendo.cloud")
