@@ -16,7 +16,7 @@ import java.util.Set;
 
 public final class Main extends JavaPlugin {
 
-    File paperFile = new File(this.getDataFolder()+"/paper.jar");
+    File paperFile = new File(this.getDataFolder(), "paper.jar");
 
 
     private ScriptBindings bindings;
@@ -44,15 +44,18 @@ public final class Main extends JavaPlugin {
                     .build();
 
             Reflections reflections = new Reflections(new ConfigurationBuilder()
-                    .addUrls(paperUrl)
-                    .forPackages("org.bukkit")
-                    .addClassLoader(this.getClass().getClassLoader())
-                    .addScanners(new SubTypesScanner(false)));
+                    .addUrls(paperUrl)  // Paper's JAR file
+                    .forPackages("org.bukkit")  // Scan org.bukkit package
+                    .addClassLoader(Bukkit.class.getClassLoader())  // Add the class loader for Bukkit (or Paper)
+                    .addScanners(new SubTypesScanner(false))  // Disable scanning of subtypes
+            );
 
 
+            // Get all subtypes of Object (all classes within the org.bukkit package)
             Set<Class<?>> bukkitClasses = reflections.getSubTypesOf(Object.class);
-            System.out.println(bukkitClasses.toString());
 
+            // Output the results
+            System.out.println("Found " + bukkitClasses.size() + " classes.");
             for (Class<?> clazz : bukkitClasses) {
                 context.getBindings("js").putMember(clazz.getSimpleName(), clazz);
                 System.out.println(clazz.getSimpleName());
@@ -71,6 +74,7 @@ public final class Main extends JavaPlugin {
             Register.get().autoRegisterCommands();
             Register.get().autoRegisterListeners();
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
