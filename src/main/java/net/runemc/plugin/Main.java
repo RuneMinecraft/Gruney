@@ -1,22 +1,24 @@
 package net.runemc.plugin;
 
 import net.runemc.plugin.scripting.*;
-import net.runemc.utils.Utils;
 import net.runemc.utils.command.Register;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
-import org.graalvm.polyglot.Value;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ConfigurationBuilder;
 
-import java.lang.reflect.Modifier;
-import java.util.Map;
+import java.io.File;
+import java.net.URL;
 import java.util.Set;
 
 public final class Main extends JavaPlugin {
+
+    File paperFile = new File(this.getDataFolder()+"/paper.jar");
+
+
     private ScriptBindings bindings;
     public ScriptBindings bindings() {
         return this.bindings;
@@ -30,6 +32,7 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
+            URL paperUrl = paperFile.toURI().toURL();
             instance = this;
             bindings = new ScriptBindings();
 
@@ -41,11 +44,19 @@ public final class Main extends JavaPlugin {
                     .build();
 
             Reflections reflections = new Reflections(new ConfigurationBuilder()
+                    .addUrls(paperUrl)
                     .forPackages("org.bukkit")
-                    .addScanners(new SubTypesScanner(true)));
+                    .addClassLoader(this.getClass().getClassLoader())
+                    .addScanners(new SubTypesScanner(false)));
 
-            Map<String, Object> bukkitClasses = ReflectionsUtils.wrapClasses(ReflectionsUtils.getAllClasses("org.bukkit"));
-            ScriptManager.loadResources();
+
+            Set<Class<?>> bukkitClasses = reflections.getSubTypesOf(Object.class);
+            System.out.println(bukkitClasses.toString());
+
+            for (Class<?> clazz : bukkitClasses) {
+                context.getBindings("js").putMember(clazz.getSimpleName(), clazz);
+                System.out.println(clazz.getSimpleName());
+            }
 
             context.getBindings("js").putMember("Bukkit", Bukkit.class);
             context.getBindings("js").putMember("Static", new StaticWrapper());
