@@ -19,9 +19,15 @@ public class RunScript extends ICommand {
         }
         final long startTime = System.currentTimeMillis();
 
+
+
         try {
             String scriptPath = args[0];
-            Script script = new Script(scriptPath, Main.get().bindings().sharedBindings());
+            if (!Main.get().bindings().hasScript(scriptPath)) {
+                sender.sendMessage("You need to load the script first!");
+                return;
+            }
+            Script script = Main.get().bindings().getScript(scriptPath);
             int result = script.execute();
 
             switch (result) {

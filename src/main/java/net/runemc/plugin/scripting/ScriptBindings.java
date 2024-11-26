@@ -3,7 +3,6 @@ package net.runemc.plugin.scripting;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Value;
 
-import javax.script.Bindings;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -32,6 +31,9 @@ public class ScriptBindings {
     }
     public Script removeScript(String name) {
         return scripts.remove(name);
+    }
+    public boolean hasScript(String name) {
+        return scripts.containsKey(name);
     }
     public boolean isScriptLoaded(String name) {
         return scripts.containsKey(name);

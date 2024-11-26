@@ -28,6 +28,7 @@ public class LoadScript extends ICommand {
             String scriptPath = args[0];
             Script script = new Script(scriptPath, Main.get().bindings().sharedBindings());
             int result = script.load();
+            Main.get().bindings().addScript(scriptPath, script);
 
             switch (result) {
                 case ErrorCode.SUCCESS -> sender.sendMessage(Colour("&aSuccessfully loaded the script &f" + scriptPath + "&a! &7&o(Took " + (System.currentTimeMillis() - startTime) + "ms)"));
