@@ -16,7 +16,7 @@ public class ReflectionsUtils {
      * @param basePackage The base package to scan (e.g., "org.bukkit").
      * @return A map of class simple names to Class objects.
      */
-    static Map<String, Class<?>> getAllClasses(String basePackage) {
+    public static Map<String, Class<?>> getAllClasses(String basePackage) {
         Reflections reflections = new Reflections(new ConfigurationBuilder()
                 .forPackages(basePackage)
                 .addScanners(new SubTypesScanner()));
@@ -30,7 +30,7 @@ public class ReflectionsUtils {
      * @param classes A map of class names to Class<?> objects.
      * @return A map of class names to JavaScript-friendly wrappers.
      */
-    static Map<String, Object> wrapClasses(Map<String, Class<?>> classes) {
+    public static Map<String, Object> wrapClasses(Map<String, Class<?>> classes) {
         return classes.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
