@@ -68,7 +68,6 @@ public class ScriptManager {
         context.getBindings("js").putMember("Bukkit", Bukkit.class);
         context.getBindings("js").putMember("Static", new StaticWrapper());
 
-        // Execute the script content
         context.eval("js", scriptContent);
 
         String scriptName = scriptFile.getName();
