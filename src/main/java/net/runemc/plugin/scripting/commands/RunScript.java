@@ -3,6 +3,7 @@ package net.runemc.plugin.scripting.commands;
 import net.runemc.plugin.Main;
 import net.runemc.plugin.scripting.ErrorCode;
 import net.runemc.plugin.scripting.Script;
+import net.runemc.utils.Locale;
 import net.runemc.utils.command.Cmd;
 import net.runemc.utils.command.ICommand;
 import org.bukkit.command.CommandSender;
@@ -30,11 +31,7 @@ public class RunScript extends ICommand {
             Script script = Main.get().bindings().getScript(scriptPath);
             int result = script.execute();
 
-            switch (result) {
-                case ErrorCode.SUCCESS -> sender.sendMessage(Colour("&aSuccessfully executing the script &f" + scriptPath + "&a! &7&o(Took " + (System.currentTimeMillis() - startTime) + "ms)"));
-                case ErrorCode.ERROR_DURING_EXECUTION -> sender.sendMessage(Colour("&cAn unexpected error has occured whilst loading the executing &f"+scriptPath));
-                default -> sender.sendMessage(Colour("&cFailed to executing script: &f" + scriptPath));
-            }
+            player().sendMessage(Locale.TRANSLATE_SCRIPT_ERROR(result) + "(" + result + ")");
         }catch(Exception e) {
             sender.sendMessage("Error executing script: " + e.getMessage());
             e.printStackTrace();
