@@ -43,7 +43,7 @@ public final class Main extends JavaPlugin {
 
             Reflections reflections = new Reflections(new ConfigurationBuilder()
                     .forPackages("org.bukkit")
-                    .addScanners(new SubTypesScanner(false)));
+                    .addScanners(new SubTypesScanner(true)));
 
             Set<Class<?>> bukkitClasses = reflections.getSubTypesOf(Object.class);
             System.out.println(bukkitClasses.toString());
