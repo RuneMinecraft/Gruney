@@ -15,10 +15,10 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        this.scriptManager = new ScriptManager(this);
 
         Register reg = Register.get();
         reg.autoRegisterCommands();
-        scriptManager = new ScriptManager(this);
     }
 
     @Override
