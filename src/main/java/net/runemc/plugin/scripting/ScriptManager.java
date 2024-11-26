@@ -8,10 +8,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.*;
 
 public class ScriptManager {
-
     private final Main plugin;
     private final Map<String, Context> scripts;
     private final Map<String, String> scriptContents;
@@ -31,28 +31,30 @@ public class ScriptManager {
         if (!scriptFile.exists()) {
             throw new IOException("Script file not found: " + scriptFile.getAbsolutePath());
         }
-
         String scriptContent = new String(java.nio.file.Files.readAllBytes(scriptFile.toPath()));
+        Context context = Context.newBuilder("js")
+                .allowAllAccess(true)
+                .build();
 
-        // Create the context
-        Context context = Context.create();
+        Map<String, Object> bukkitClasses = ReflectionsUtils.wrapClasses(ReflectionsUtils.getAllClasses("org.bukkit"));
+        Map<String, Object> paperClasses = ReflectionsUtils.wrapClasses(ReflectionsUtils.getAllClasses("io.papermc"));
 
-        // Expose Bukkit as a full object (not just one method) to the JavaScript context
+        Map<String, Object> allClasses = new HashMap<>(bukkitClasses);
+        allClasses.putAll(paperClasses);
+
+        context.getBindings("js").putMember("Java", org.graalvm.polyglot.proxy.ProxyObject.fromMap(allClasses));
+
         context.getBindings("js").putMember("Bukkit", Bukkit.class);
-
-        // Expose the Player class directly to the JavaScript context for later usage
-        context.getBindings("js").putMember("Player", org.bukkit.entity.Player.class);
+        context.getBindings("js").putMember("Static", new StaticWrapper());
 
         context.eval("js", scriptContent);
 
         String scriptName = scriptFile.getName();
         scripts.put(scriptName, context);
         scriptContents.put(scriptName, scriptContent);
+
         plugin.getLogger().info("Loaded script: " + scriptName);
     }
-
-
-
     public void unloadScript(String scriptName) {
         Future<?> task = runningTasks.remove(scriptName);
         if (task != null) {
@@ -66,7 +68,6 @@ public class ScriptManager {
             plugin.getLogger().warning("Script not found: " + scriptName);
         }
     }
-
     public void unloadAllScripts() {
         for (Future<?> task : runningTasks.values()) {
             task.cancel(true);
@@ -77,7 +78,6 @@ public class ScriptManager {
         scriptContents.clear();
         plugin.getLogger().info("Unloaded all scripts");
     }
-
     public void executeScript(String scriptName) {
         String scriptContent = scriptContents.get(scriptName);
 
@@ -102,7 +102,6 @@ public class ScriptManager {
 
         runningTasks.put(scriptName, task);
     }
-
     public Map<String, Context> getScripts() {
         return scripts;
     }
