@@ -1,5 +1,6 @@
 package net.runemc.plugin;
 
+import net.runemc.plugin.scripting.ReflectionsUtils;
 import net.runemc.plugin.scripting.Script;
 import net.runemc.plugin.scripting.ScriptBindings;
 import net.runemc.plugin.scripting.StaticWrapper;
@@ -15,6 +16,7 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.reflect.Modifier;
+import java.util.Map;
 import java.util.Set;
 
 public final class Main extends JavaPlugin {
@@ -45,12 +47,14 @@ public final class Main extends JavaPlugin {
                     .forPackages("org.bukkit")
                     .addScanners(new SubTypesScanner(true)));
 
-            Set<Class<?>> bukkitClasses = reflections.getSubTypesOf(Object.class);
+            Map<String, Object> bukkitClasses = ReflectionsUtils.wrapClasses(ReflectionsUtils.getAllClasses("org.bukkit"));
             System.out.println(bukkitClasses.toString());
 
-            for (Class<?> clazz : bukkitClasses) {
-                context.getBindings("js").putMember(clazz.getSimpleName(), clazz);
-                System.out.println(clazz.getSimpleName());
+            for (Object clazz : bukkitClasses.values()) {
+                if (clazz instanceof Class<?> c) {
+                    context.getBindings("js").putMember(c.getSimpleName(), c);
+                    System.out.println(c.getSimpleName());
+                }
             }
 
             context.getBindings("js").putMember("Bukkit", Bukkit.class);
