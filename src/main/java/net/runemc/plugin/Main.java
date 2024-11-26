@@ -26,6 +26,8 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
         try {
             instance = this;
+            bindings = new ScriptBindings();
+
             Context context = Context.newBuilder("js")
                     .option("engine.WarnInterpreterOnly", "false")
                     .allowAllAccess(true)

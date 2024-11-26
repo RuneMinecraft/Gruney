@@ -8,7 +8,7 @@ public final class Locale {
     public static final String PLAYER_ONLY_COMMAND = "&cThis command can only be ran by a player!";
     public static String TRANSLATE_SCRIPT_ERROR(int code){
         switch (code){
-            case 0 -> {return "§aSuccessfull";}
+            case 0 -> {return "§aSuccessful";}
             case 1 -> {return "§eScript Already Loaded";}
             case 2 -> {return "§eScript not loaded";}
             case 3 -> {return "§cError During Loading";}
