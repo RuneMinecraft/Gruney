@@ -28,7 +28,7 @@ public class Script extends Executable {
         }
 
         try {
-            Context context = Context.getCurrent();
+            Context context = Main.get().bindings().sharedBindings().getContext();
             context.enter();
             context.getBindings("js").putMember("Shared", sharedBindings);
             context.eval("js", content);
