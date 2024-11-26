@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 public final class Main extends JavaPlugin {
-    private static final RuneClassLoader classLoader = RuneClassLoader.getInstance();
+    private static RuneClassLoader classLoader;
     public static RuneClassLoader classLoader() {
         return classLoader;
     }
@@ -32,6 +32,7 @@ public final class Main extends JavaPlugin {
 
             File pluginDirectory = new File("plugins");
             RuneClassLoader.initialize(pluginDirectory, Main.class.getClassLoader());
+            classLoader = RuneClassLoader.getInstance();
 
             Register reg = Register.get();
             reg.autoRegisterCommands();
