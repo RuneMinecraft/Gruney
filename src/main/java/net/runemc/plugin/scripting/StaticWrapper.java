@@ -12,6 +12,7 @@ public class StaticWrapper {
                     .filter(m -> m.getName().equals(methodName))
                     .findFirst()
                     .orElseThrow(() -> new NoSuchMethodException("Method not found: " + methodName));
+
             return method.invoke(null, args);
         } catch (Exception e) {
             throw new RuntimeException("Error invoking static method: " + className + "." + methodName, e);

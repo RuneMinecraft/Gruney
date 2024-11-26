@@ -10,6 +10,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ConfigurationBuilder;
+
+import java.lang.reflect.Modifier;
+import java.util.Set;
 
 public final class Main extends JavaPlugin {
     private ScriptBindings bindings;
@@ -35,7 +41,17 @@ public final class Main extends JavaPlugin {
                     .allowHostClassLookup(className -> true)
                     .build();
 
-            context.getBindings("js").putMember("Java", org.graalvm.polyglot.proxy.ProxyObject.fromMap(Utils.getClasses()));
+            Reflections reflections = new Reflections(new ConfigurationBuilder()
+                    .forPackages("org.bukkit")
+                    .addScanners(new SubTypesScanner(false)));
+
+            Set<Class<?>> bukkitClasses = reflections.getSubTypesOf(Object.class);
+
+            for (Class<?> clazz : bukkitClasses) {
+                context.getBindings("js").putMember(clazz.getSimpleName(), clazz);
+                System.out.println(clazz.getSimpleName());
+            }
+
             context.getBindings("js").putMember("Bukkit", Bukkit.class);
             context.getBindings("js").putMember("Static", new StaticWrapper());
             context.enter();
