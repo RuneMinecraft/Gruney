@@ -19,6 +19,10 @@ public final class Main extends JavaPlugin {
 
         Register reg = Register.get();
         reg.autoRegisterCommands();
+
+
+
+        scriptManager.loadResources();
     }
 
     @Override

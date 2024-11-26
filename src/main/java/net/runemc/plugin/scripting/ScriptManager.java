@@ -19,6 +19,9 @@ public class ScriptManager {
     private final Map<String, Future<?>> runningTasks;
     private final ExecutorService executor;
 
+    private Map<String, Object> allClasses;
+    private Map<String, Object> pluginUtils;
+
     public ScriptManager(Main plugin) {
         this.plugin = plugin;
         this.scripts = new ConcurrentHashMap<>();
@@ -28,12 +31,29 @@ public class ScriptManager {
     }
 
     /**
+     * Pre-loads the resources once (e.g., Bukkit and Paper classes).
+     */
+    public void loadResources() {
+        Map<String, Object> bukkitClasses = ReflectionsUtils.wrapClasses(ReflectionsUtils.getAllClasses("org.bukkit"));
+        Map<String, Object> paperClasses = ReflectionsUtils.wrapClasses(ReflectionsUtils.getAllClasses("io.papermc"));
+
+        allClasses = new HashMap<>(bukkitClasses);
+        allClasses.putAll(paperClasses);
+
+        pluginUtils = new HashMap<>();
+        pluginUtils.put("Plugin", plugin);
+        pluginUtils.put("Logger", plugin.getLogger());
+
+        plugin.getLogger().info("Resources pre-loaded");
+    }
+
+    /**
      * Asynchronously loads a script.
      */
     public void loadScriptAsync(String path) {
         executor.submit(() -> {
             try {
-                loadScript(path);  // Call the synchronous load method in a separate thread
+                loadScript(path);
             } catch (IOException e) {
                 plugin.getLogger().severe("Error loading script: " + path + " - " + e.getMessage());
             }
@@ -53,16 +73,6 @@ public class ScriptManager {
                 .allowAllAccess(true)
                 .build();
 
-        Map<String, Object> bukkitClasses = ReflectionsUtils.wrapClasses(ReflectionsUtils.getAllClasses("org.bukkit"));
-        Map<String, Object> paperClasses = ReflectionsUtils.wrapClasses(ReflectionsUtils.getAllClasses("io.papermc"));
-
-        Map<String, Object> allClasses = new HashMap<>(bukkitClasses);
-        allClasses.putAll(paperClasses);
-
-        Map<String, Object> pluginUtils = new HashMap<>();
-        pluginUtils.put("Plugin", plugin);
-        pluginUtils.put("Logger", plugin.getLogger());
-
         context.getBindings("js").putMember("PluginUtils", pluginUtils);
         context.getBindings("js").putMember("Java", org.graalvm.polyglot.proxy.ProxyObject.fromMap(allClasses));
         context.getBindings("js").putMember("Bukkit", Bukkit.class);
@@ -76,7 +86,6 @@ public class ScriptManager {
 
         plugin.getLogger().info("Loaded script: " + scriptName);
     }
-
 
     /**
      * Unloads a specific script.
@@ -128,7 +137,7 @@ public class ScriptManager {
                     plugin.getLogger().info("Executed script: " + scriptName);
                 } catch (Exception e) {
                     plugin.getLogger().severe("Error executing script: " + scriptName + " - " + e.getMessage());
-                    e.printStackTrace();  // Log the stack trace for more detailed debugging
+                    e.printStackTrace();
                 }
             } else {
                 plugin.getLogger().warning("Script context not found: " + scriptName);
@@ -152,7 +161,7 @@ public class ScriptManager {
         executor.shutdown();
         try {
             if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                executor.shutdownNow();  // Forcefully shut down if not terminated in time
+                executor.shutdownNow();
             }
         } catch (InterruptedException e) {
             executor.shutdownNow();
