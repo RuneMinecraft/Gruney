@@ -1,9 +1,6 @@
 package net.runemc.plugin;
 
-import net.runemc.plugin.scripting.ReflectionsUtils;
-import net.runemc.plugin.scripting.Script;
-import net.runemc.plugin.scripting.ScriptBindings;
-import net.runemc.plugin.scripting.StaticWrapper;
+import net.runemc.plugin.scripting.*;
 import net.runemc.utils.Utils;
 import net.runemc.utils.command.Register;
 import org.bukkit.Bukkit;
@@ -48,14 +45,7 @@ public final class Main extends JavaPlugin {
                     .addScanners(new SubTypesScanner(true)));
 
             Map<String, Object> bukkitClasses = ReflectionsUtils.wrapClasses(ReflectionsUtils.getAllClasses("org.bukkit"));
-            System.out.println(bukkitClasses.toString());
-
-            for (Object clazz : bukkitClasses.values()) {
-                if (clazz instanceof Class<?> c) {
-                    context.getBindings("js").putMember(c.getSimpleName(), c);
-                    System.out.println(c.getSimpleName());
-                }
-            }
+            ScriptManager.loadResources();
 
             context.getBindings("js").putMember("Bukkit", Bukkit.class);
             context.getBindings("js").putMember("Static", new StaticWrapper());

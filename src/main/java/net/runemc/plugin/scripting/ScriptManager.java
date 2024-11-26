@@ -27,18 +27,14 @@ public class ScriptManager {
         this.executor = Executors.newCachedThreadPool();
     }
 
-    public void loadResources() {
+    public static void loadResources() {
         Map<String, Object> bukkitClasses = ReflectionsUtils.wrapClasses(ReflectionsUtils.getAllClasses("org.bukkit"));
         Map<String, Object> paperClasses = ReflectionsUtils.wrapClasses(ReflectionsUtils.getAllClasses("io.papermc"));
 
-        allClasses = new HashMap<>(bukkitClasses);
+        Map<String, Object> allClasses = new HashMap<>(bukkitClasses);
         allClasses.putAll(paperClasses);
 
-        pluginUtils = new HashMap<>();
-        pluginUtils.put("Plugin", plugin);
-        pluginUtils.put("Logger", plugin.getLogger());
-
-        plugin.getLogger().info("Resources pre-loaded");
+        System.out.println(allClasses);
     }
 
     public void loadScript(String path) throws IOException {
