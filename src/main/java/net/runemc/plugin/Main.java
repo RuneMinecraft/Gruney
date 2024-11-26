@@ -46,6 +46,7 @@ public final class Main extends JavaPlugin {
                     .addScanners(new SubTypesScanner(false)));
 
             Set<Class<?>> bukkitClasses = reflections.getSubTypesOf(Object.class);
+            System.out.println(bukkitClasses.toString());
 
             for (Class<?> clazz : bukkitClasses) {
                 context.getBindings("js").putMember(clazz.getSimpleName(), clazz);
