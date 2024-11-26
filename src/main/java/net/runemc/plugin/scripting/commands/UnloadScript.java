@@ -4,6 +4,7 @@ import net.runemc.plugin.Main;
 import net.runemc.plugin.scripting.ErrorCode;
 import net.runemc.plugin.scripting.Script;
 import net.runemc.plugin.scripting.ScriptManager;
+import net.runemc.utils.Locale;
 import net.runemc.utils.command.Cmd;
 import net.runemc.utils.command.ICommand;
 import org.bukkit.command.CommandSender;
@@ -22,15 +23,15 @@ public class UnloadScript extends ICommand {
 
         try {
             String scriptPath = args[0];
-            Script script = new Script(scriptPath, Main.get().bindings().sharedBindings());
-            int result = script.unload();
-
-            switch (result) {
-                case ErrorCode.SUCCESS -> sender.sendMessage(Colour("&aSuccessfully unloaded the script &f" + scriptPath + "&a! &7&o(Took " + (System.currentTimeMillis() - startTime) + "ms)"));
-                case ErrorCode.SCRIPT_NOT_LOADED -> sender.sendMessage(Colour("&f"+scriptPath+" &cis already unloaded!"));
-                case ErrorCode.ERROR_DURING_UNLOADING -> sender.sendMessage(Colour("&cAn unexpected error has occured whilst unloaded the script &f"+scriptPath));
-                default -> sender.sendMessage(Colour("&cFailed to unload script: &f" + scriptPath));
+            if (!Main.get().bindings().hasScript(scriptPath)) {
+                sender.sendMessage("That script isn't loaded!");
+                return;
             }
+            Script script = Main.get().bindings().getScript(scriptPath);
+            int result = script.unload();
+            Main.get().bindings().removeScript(scriptPath);
+
+            player().sendMessage(Locale.TRANSLATE_SCRIPT_ERROR(result) + "(" + result + ")");
         }catch(Exception e) {
             sender.sendMessage("Error unloading script: " + e.getMessage());
             e.printStackTrace();
