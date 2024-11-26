@@ -2,10 +2,8 @@ package net.runemc.plugin.scripting;
 
 import net.runemc.plugin.Main;
 import org.graalvm.polyglot.*;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,10 +36,9 @@ public class ScriptManager {
         String scriptName = scriptFile.getName();
         scripts.put(scriptName, context);
         bindings.put(scriptName, result);
-        scriptContents.put(scriptName, scriptContent); // Save the script content
+        scriptContents.put(scriptName, scriptContent);
         plugin.getLogger().info("Loaded script: " + scriptName);
     }
-
 
     public void unloadScript(String scriptName) {
         if (scripts.remove(scriptName) != null) {
@@ -51,7 +48,6 @@ public class ScriptManager {
             plugin.getLogger().warning("Script not found: " + scriptName);
         }
     }
-
     public void unloadAllScripts() {
         scripts.clear();
         bindings.clear();
@@ -72,7 +68,6 @@ public class ScriptManager {
     public Map<String, Context> getScripts() {
         return scripts;
     }
-
     public Map<String, Value> getBindings() {
         return bindings;
     }
