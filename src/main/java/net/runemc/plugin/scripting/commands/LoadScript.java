@@ -23,7 +23,7 @@ public class LoadScript extends ICommand {
         try {
             String scriptName = args[0];
             scriptManager.loadScript(scriptName);
-            sender.sendMessage(Colour("&aSuccessfully loaded the script &f"+scriptName+"a! (&7&oTook "+(System.currentTimeMillis()-startTime)+"ms)"));
+            sender.sendMessage(Colour("&aSuccessfully loaded the script &f"+scriptName+"&a! (&7&oTook "+(System.currentTimeMillis()-startTime)+"ms)"));
         }catch(Exception e) {
             sender.sendMessage("Error loading script: " + e.getMessage());
             e.printStackTrace();
