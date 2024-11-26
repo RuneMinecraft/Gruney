@@ -41,6 +41,9 @@ public final class Main extends JavaPlugin {
 
             this.bindings().setSharedBindings(context.getBindings("js"));
             Script script = new Script("scripts/bootstrap.js", bindings().sharedBindings());
+            script.load();
+            script.execute();
+            script.unload();
 
             Register.get().autoRegisterCommands();
             Register.get().autoRegisterListeners();
