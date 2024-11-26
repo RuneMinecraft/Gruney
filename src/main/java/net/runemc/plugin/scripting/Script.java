@@ -27,7 +27,8 @@ public class Script extends Executable {
             throw new IllegalStateException("Script must be loaded before execution.");
         }
 
-        try (Context context = sharedBindings.getContext()) {
+        try {
+            Context context = Context.getCurrent();
             context.getBindings("js").putMember("Shared", sharedBindings);
             context.eval("js", content);
         } catch (Exception e) {
