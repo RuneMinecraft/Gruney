@@ -29,6 +29,7 @@ public class Script extends Executable {
 
         try {
             Context context = Context.getCurrent();
+            context.enter();
             context.getBindings("js").putMember("Shared", sharedBindings);
             context.eval("js", content);
         } catch (Exception e) {

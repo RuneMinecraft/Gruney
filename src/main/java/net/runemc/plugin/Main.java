@@ -38,6 +38,7 @@ public final class Main extends JavaPlugin {
             context.getBindings("js").putMember("Java", org.graalvm.polyglot.proxy.ProxyObject.fromMap(Utils.getClasses()));
             context.getBindings("js").putMember("Bukkit", Bukkit.class);
             context.getBindings("js").putMember("Static", new StaticWrapper());
+            context.enter();
 
             this.bindings().setSharedBindings(context.getBindings("js"));
             Script script = new Script("scripts/bootstrap.js", bindings().sharedBindings());
