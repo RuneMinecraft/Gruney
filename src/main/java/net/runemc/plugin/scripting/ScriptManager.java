@@ -1,7 +1,6 @@
 package net.runemc.plugin.scripting;
 
 import net.runemc.plugin.Main;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.graalvm.polyglot.*;
 
 import java.io.File;
@@ -16,8 +15,8 @@ public class ScriptManager {
     private final Map<String, Context> scripts;
     private final Map<String, Value> bindings;
     private final Map<String, String> scriptContents;
-    private final Map<String, Future<?>> runningTasks; // Track running tasks
-    private final ExecutorService executor; // Thread pool for script execution
+    private final Map<String, Future<?>> runningTasks;
+    private final ExecutorService executor;
 
     public ScriptManager(Main plugin) {
         this.plugin = plugin;
@@ -25,7 +24,7 @@ public class ScriptManager {
         this.bindings = new HashMap<>();
         this.scriptContents = new HashMap<>();
         this.runningTasks = new HashMap<>();
-        this.executor = Executors.newCachedThreadPool(); // Dynamic thread pool
+        this.executor = Executors.newCachedThreadPool();
     }
 
     public void loadScript(String path) throws IOException {
@@ -47,7 +46,6 @@ public class ScriptManager {
     }
 
     public void unloadScript(String scriptName) {
-        // Cancel the task if it is running
         Future<?> task = runningTasks.remove(scriptName);
         if (task != null) {
             task.cancel(true);
