@@ -15,7 +15,11 @@ import java.util.List;
 import java.util.Optional;
 
 public final class Main extends JavaPlugin {
-    private RuneClassLoader classLoader;
+    private static final RuneClassLoader classLoader = RuneClassLoader.getInstance();
+    public static RuneClassLoader classLoader() {
+        return classLoader;
+    }
+
     private static Main instance;
     public static Main get() {
         return instance;
@@ -23,34 +27,15 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        instance = this;
         try {
-            File pluginClassesDir = new File(getDataFolder(), "classes");
-            if (!pluginClassesDir.exists() && !pluginClassesDir.mkdirs()) {
-                getLogger().severe("Failed to create plugin classes directory!");
-                return;
-            }
+            instance = this;
 
-            classLoader = RuneClassLoader.fromPluginDirectory(pluginClassesDir, getClass().getClassLoader());
-            getLogger().info("RuneClassLoader initialized.");
+            File pluginDirectory = new File("plugins");
+            RuneClassLoader.initialize(pluginDirectory, Main.class.getClassLoader());
 
-            classLoader.compileJavaFiles(pluginClassesDir);
-            getLogger().info("All .java files compiled successfully.");
-
-            String className = "net.runemc.Test";
-            Class<?> myClass = classLoader.loadClass(className);
-            Object instance = classLoader.createInstance(className);
-
-            getLogger().info("Loaded class: " + myClass.getName());
-            getLogger().info("Instance created: " + instance);
-
-            myClass.getMethod("main").invoke(instance);
-        } catch (IOException | ReflectiveOperationException e) {
-            getLogger().severe("Failed to load classes: " + e.getMessage());
-            e.printStackTrace();
-        }
-        Register reg = Register.get();
-        reg.autoRegisterCommands();
+            Register reg = Register.get();
+            reg.autoRegisterCommands();
+        }catch(Exception ignored){}
     }
 
 

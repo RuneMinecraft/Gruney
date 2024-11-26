@@ -16,7 +16,7 @@ public final class Message implements Utils {
     private final Set<CommandSender> players;
     private final String[] messages;
 
-    private Message(MessageType type, Set<?> input, String... messages) {
+    private Message(MessageType type, Set<CommandSender> input, String... messages) {
         this.type = type;
         this.messages = messages;
         this.players = new HashSet<>();
@@ -53,10 +53,6 @@ public final class Message implements Utils {
     }
 
     public void send() {
-        if (players == null) {
-            Logger.log("Failed to send a message. 'Set<CommandSender> players' is null.");
-            return;
-        }
         if (messages == null) {
             Logger.log("Failed to send a message. 'String[] messages' is null.");
             return;

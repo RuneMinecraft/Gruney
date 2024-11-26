@@ -13,12 +13,27 @@ import java.util.List;
 public final class RuneClassLoader {
     private final List<Class<?>> loadedClasses = new ArrayList<>();
     private final URLClassLoader classLoader;
+    private static RuneClassLoader instance;
 
     private RuneClassLoader(URL[] urls, ClassLoader parent) {
         this.classLoader = new URLClassLoader(urls, parent);
     }
 
-    public static RuneClassLoader fromPluginDirectory(File directory, ClassLoader parent) throws IOException {
+    public static void initialize(File pluginDirectory, ClassLoader parent) throws IOException {
+        if (instance != null) {
+            throw new IllegalStateException("RuneClassLoader has already been initialized!");
+        }
+        instance = fromPluginDirectory(pluginDirectory, parent);
+    }
+
+    public static RuneClassLoader getInstance() {
+        if (instance == null) {
+            throw new IllegalStateException("RuneClassLoader has not been initialized!");
+        }
+        return instance;
+    }
+
+    private static RuneClassLoader fromPluginDirectory(File directory, ClassLoader parent) throws IOException {
         if (!directory.exists() || !directory.isDirectory()) {
             throw new IllegalArgumentException("The provided path is not a valid directory!");
         }
@@ -76,6 +91,15 @@ public final class RuneClassLoader {
         return loadedClass.getDeclaredConstructor().newInstance();
     }
 
+    public Object loadScript(String fileName) throws ReflectiveOperationException, IOException {
+        File javaFile = new File(classLoader.getURLs()[0].getFile(), fileName + ".java");
+        if (!javaFile.exists()) {
+            throw new IllegalArgumentException("File not found: " + javaFile.getAbsolutePath());
+        }
+        compileJavaFiles(javaFile.getParentFile());
+        return createInstance(fileName);
+    }
+
     public void unload() {
         synchronized (loadedClasses) {
             loadedClasses.clear();
@@ -84,6 +108,15 @@ public final class RuneClassLoader {
             classLoader.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void unloadScript(String fileName) {
+        File file = new File(classLoader.getURLs()[0].getFile(), fileName + ".java");
+        if (file.exists()) {
+            System.out.println("Unloading script: " + file.getName());
+        } else {
+            System.out.println("Script not found: " + file.getName());
         }
     }
 }
