@@ -1,8 +1,9 @@
 package net.runemc.plugin.scripting;
 
 import net.runemc.plugin.Main;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.graalvm.polyglot.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -13,7 +14,6 @@ public class ScriptManager {
 
     private final Main plugin;
     private final Map<String, Context> scripts;
-    private final Map<String, Value> bindings;
     private final Map<String, String> scriptContents;
     private final Map<String, Future<?>> runningTasks;
     private final ExecutorService executor;
@@ -21,7 +21,6 @@ public class ScriptManager {
     public ScriptManager(Main plugin) {
         this.plugin = plugin;
         this.scripts = new HashMap<>();
-        this.bindings = new HashMap<>();
         this.scriptContents = new HashMap<>();
         this.runningTasks = new HashMap<>();
         this.executor = Executors.newCachedThreadPool();
@@ -35,15 +34,24 @@ public class ScriptManager {
 
         String scriptContent = new String(java.nio.file.Files.readAllBytes(scriptFile.toPath()));
 
+        // Create the context
         Context context = Context.create();
-        Value result = context.eval("js", scriptContent);
+
+        // Expose Bukkit as a full object (not just one method) to the JavaScript context
+        context.getBindings("js").putMember("Bukkit", Bukkit.class);
+
+        // Expose the Player class directly to the JavaScript context for later usage
+        context.getBindings("js").putMember("Player", org.bukkit.entity.Player.class);
+
+        context.eval("js", scriptContent);
 
         String scriptName = scriptFile.getName();
         scripts.put(scriptName, context);
-        bindings.put(scriptName, result);
         scriptContents.put(scriptName, scriptContent);
         plugin.getLogger().info("Loaded script: " + scriptName);
     }
+
+
 
     public void unloadScript(String scriptName) {
         Future<?> task = runningTasks.remove(scriptName);
@@ -52,7 +60,6 @@ public class ScriptManager {
         }
 
         if (scripts.remove(scriptName) != null) {
-            bindings.remove(scriptName);
             scriptContents.remove(scriptName);
             plugin.getLogger().info("Unloaded script: " + scriptName);
         } else {
@@ -67,7 +74,6 @@ public class ScriptManager {
         runningTasks.clear();
 
         scripts.clear();
-        bindings.clear();
         scriptContents.clear();
         plugin.getLogger().info("Unloaded all scripts");
     }
@@ -99,10 +105,6 @@ public class ScriptManager {
 
     public Map<String, Context> getScripts() {
         return scripts;
-    }
-
-    public Map<String, Value> getBindings() {
-        return bindings;
     }
 
     public void shutdown() {
